@@ -97,7 +97,7 @@ for e in T:
     for i in range(0,n_genpart):
         part1 = pdgid[i]
         part2 = motherpdgid[i]
-        if part1 == 22: # and (part2 == 9000121 or part2 == 9000025): --> these to ids aren't in the guide
+        if part1 == 22: # and (part2 == 9000121 or part2 == 9000025): --> these two ids aren't in the guide
             genpartvectors.append(TLorentzVector(gen_pt[i], gen_eta[i], gen_phi[i], gen_energy[i]))
             genpartvectmomid.append(part2)
     # if len(genpartvectors) ==3:
@@ -106,7 +106,7 @@ for e in T:
     #     break
     if genpartvectmomid[0] == 9000121 and genpartvectmomid[1] == 9000025: # this gets the 3 photon events (maybe)
         genV = genpartvectors[0]+genpartvectors[1]+genpartvectors[2]
-        print(genpartvectmomid)
+        # print(genpartvectmomid)
     H_genmasstot.Fill(genV.M())
     # print(genpartvectmomid)
 
