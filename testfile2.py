@@ -2,10 +2,13 @@ import ROOT
 from ROOT import *
 from array import array
 
+## this file was used to test analysis on FlatAOD files and create variable bin histograms,
+## BUT there was a major issue in how the TLorentzVector() was used to construct 4-vectors
+## DO NOT USE THIS FOR ANALYSIS
+
 print("ROOT is loaded.")
 
-# ~~ Comment this in or out if need variable bin lengths
-## variable bin length - array must be (NBins+1) from beginning to end of range
+# variable bin length - array must be (NBins+1) from beginning to end of range
 # binLowE = [2,4,9,15,20,22]
 # binLowE = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, ]
 # binLowE = []
@@ -44,7 +47,6 @@ print("ROOT is loaded.")
 # # print(binLowE)
 # print(NBins)
 
-# ~~ Setting up all the histograms
 # histogram = TH1I(name, title, x dimension (bin, x start, x end))
 # H_nPhotons = TH1I("N_pho", ";Number of pat::photons;Events", 10, 0, 10)
 H_pt = TH1I("pT", ";all photon p_{T} (GeV):Events",100,0.,2000.)
@@ -60,7 +62,6 @@ H_massduo = TH1I("Massduo", "Mass:Events", 100, 0., 5000.)
 # H_mass02 = TH1I("Mass02", "Mass:Events", (NBins-1), array('d',binLowE))
 # H_massduo = TH1I("Massduo", "Mass:Events", (NBins-1), array('d', binLowE))
 
-# ~~ Opening files and trees
 F = TFile("BkkToGRadionToGGG_M1-1000_R0-20_2018_FlatAODv3_0.root")
 G = TFile("BkkToGRadionToGGG_M1-3000_R0-60_2018_FlatAODv3_0.root")
 T = F.Get("flattener/tree")
@@ -68,8 +69,8 @@ U = G.Get("flattener/tree")
 
 print("tree is loaded.")
 
-# pt is transverse momentum?? figure that out --> it is
-# counter1=0
+# pt is transverse momentum?? figure that out
+counter1=0
 for e in T:
     vectors = []
     genpartvectors = []
@@ -93,20 +94,24 @@ for e in T:
     p_energy = e.patpho_energy
     n_pho = len(p_pt)
     n_genpart = len(pdgid) #same length as mompdgid
+    print("event")
+    for i in range(n_pho):
+        print(p_energy[i])
+        print(p_pt[i])
     # print(n_pho)
     for i in range(0,n_genpart):
         part1 = pdgid[i]
         part2 = motherpdgid[i]
-        if part1 == 22: # and (part2 == 9000121 or part2 == 9000025): --> these two ids aren't in the guide
+        if part1 == 22:# and (part2 == 9000121 or part2 == 9000025):
             genpartvectors.append(TLorentzVector(gen_pt[i], gen_eta[i], gen_phi[i], gen_energy[i]))
             genpartvectmomid.append(part2)
     # if len(genpartvectors) ==3:
     #     counter1 += 1
     # if len(genpartvectmomid) < 3:
     #     break
-    if genpartvectmomid[0] == 9000121 and genpartvectmomid[1] == 9000025: # this gets the 3 photon events (maybe)
+    if genpartvectmomid[0] == 9000121 and genpartvectmomid[1] == 9000025:
         genV = genpartvectors[0]+genpartvectors[1]+genpartvectors[2]
-        # print(genpartvectmomid)
+        print(genpartvectmomid)
     H_genmasstot.Fill(genV.M())
     # print(genpartvectmomid)
 
@@ -158,6 +163,7 @@ for e in T:
         # # print(res0[0], res1[0], res2[0])
 
 
+
     # angles0 = []
     # angles1 = []
     # angles2 = []
@@ -200,7 +206,6 @@ for e in T:
     # H_nPhotons.Fill(len(p_eta)) #this just gives number of photons, since we're taking the length of each entry.
         #  patpho_pt and patpho_eta have the same number of photons
 
-# ~~ Other tree
 # for e in U:
 #     # print("event has starts:")
 #     p_pt = e.patpho_pt
@@ -223,13 +228,11 @@ for e in T:
 # for e in T:
 #     p_eta = e.patpho_eta
 # print(counter1)
-
-# ~~ Creating histograms
-C = TCanvas()
-C.cd()
-# H_genmasstot.Draw("hist")
-H_massduo.Draw("hist")
-C.Print("Testmassduo4.pdf")
+# C = TCanvas()
+# C.cd()
+# # H_genmasstot.Draw("hist")
+# H_massduo.Draw("hist")
+# C.Print("Testmassduo4.pdf")
 #Testpmass4.pdf is photon=3 events, p_energy as last vector comp
 #Testpmass5.pdf is photon>2 events. There are some events with 4 photons?? p_energy as last vector comp
 #Testpmass6.pdf is photon>2 events. p_mass as last vector comp. bad idea, it's just zeroes
